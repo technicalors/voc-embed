@@ -37,6 +37,8 @@ export interface VocPortalHandle {
   navigate(route: string): void
   setLocale(locale: string): void
   setTheme(theme: VocTheme): void
+  /** Changes the minimum iframe height, for example when the host container is resized. */
+  setMinHeight(minHeight: number): void
   /** Removes the iframe and the message listener. Safe to call more than once. */
   destroy(): void
 }
@@ -81,7 +83,8 @@ export function buildPortalSrc(portalUrl: string, route: string, clientKey: stri
  * origin and only posted to that origin.
  */
 export function mountVocPortal(el: HTMLElement, options: VocPortalOptions): VocPortalHandle {
-  const minHeight = Math.max(0, options.minHeight ?? DEFAULT_MIN_HEIGHT)
+  let minHeight = Math.max(0, options.minHeight ?? DEFAULT_MIN_HEIGHT)
+  let contentHeight = 0
   let initialRoute = isVocRoute(options.route) ? options.route : DEFAULT_ROUTE
   let locale = toVocLocale(options.locale)
   let theme = options.theme
@@ -93,6 +96,12 @@ export function mountVocPortal(el: HTMLElement, options: VocPortalOptions): VocP
   let refreshing: Promise<void> | null = null
   let retriedAuth = false
   let destroyed = false
+
+  const applyHeight = (): void => {
+    if (iframe !== null) {
+      iframe.style.height = `${Math.max(minHeight, contentHeight)}px`
+    }
+  }
 
   const fail = (code: VocEmbedErrorCode, cause?: unknown): void => {
     if (!destroyed) {
@@ -170,9 +179,8 @@ export function mountVocPortal(el: HTMLElement, options: VocPortalOptions): VocP
         options.onNavigate?.(message.route)
         break
       case 'voc.portal.resize':
-        if (iframe !== null) {
-          iframe.style.height = `${Math.max(minHeight, Math.ceil(message.height))}px`
-        }
+        contentHeight = Math.ceil(message.height)
+        applyHeight()
         break
       case 'voc.portal.unread':
         options.onUnreadChange?.(message.count)
@@ -234,6 +242,13 @@ export function mountVocPortal(el: HTMLElement, options: VocPortalOptions): VocP
   void start()
 
   return {
+    setMinHeight(next: number): void {
+      if (destroyed || !Number.isFinite(next)) {
+        return
+      }
+      minHeight = Math.max(0, Math.floor(next))
+      applyHeight()
+    },
     navigate(route: string): void {
       if (destroyed || !isVocRoute(route)) {
         return

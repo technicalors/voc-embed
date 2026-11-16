@@ -14,7 +14,7 @@ Zero runtime dependencies. A Vue 3 component and composable ship in `@technicalo
 Until the package is published to npm, install the tarball attached to a GitHub Release:
 
 ```bash
-pnpm add https://github.com/technicalors/voc-embed/releases/download/v0.1.0/technicalors-voc-embed-0.1.0.tgz
+pnpm add https://github.com/technicalors/voc-embed/releases/download/v0.1.1/technicalors-voc-embed-0.1.1.tgz
 ```
 
 ## Vue usage
@@ -78,7 +78,7 @@ Without it the backend still returns a new token once the cached one is within 5
 | `minHeight` | `number` (px) | `600` |
 | `title` | iframe title | `VOC` |
 
-`route`, `locale` and `theme` are reactive and applied without reloading the iframe.
+`route`, `locale`, `theme` and `minHeight` are reactive and applied without reloading the iframe. Pass the height of the host content area as `minHeight` to make the portal fill the screen; the iframe still grows when the portal content is taller.
 
 | Event | Payload |
 | --- | --- |
@@ -110,6 +110,7 @@ const portal = mountVocPortal(document.getElementById('voc')!, {
 portal.navigate('/tickets/123')
 portal.setLocale('en')
 portal.setTheme('dark')
+portal.setMinHeight(720)
 portal.destroy()
 ```
 

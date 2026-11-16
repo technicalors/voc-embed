@@ -136,6 +136,20 @@ describe('mountVocPortal', () => {
     expect(onUnreadChange).toHaveBeenCalledWith(3)
   })
 
+  it('applies a new minimum height without losing the content height', async () => {
+    const { el, handle } = await mount({ minHeight: 400 })
+    const frame = frameIn(el)
+
+    emit({ v: 1, type: 'voc.portal.resize', height: 500 }, frame.contentWindow)
+    expect(frame.style.height).toBe('500px')
+
+    handle.setMinHeight(820.6)
+    expect(frame.style.height).toBe('820px')
+
+    handle.setMinHeight(300)
+    expect(frame.style.height).toBe('500px')
+  })
+
   it('queues navigate until the portal is authenticated', async () => {
     const { el, handle } = await mount()
     const frame = frameIn(el)

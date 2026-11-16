@@ -1,6 +1,6 @@
 {
   "name": "@technicalors/voc-embed",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Embed the VOC portal in a host frontend: iframe mount, postMessage handshake and token refresh. Vue 3 component included.",
   "license": "MIT",
   "type": "module",

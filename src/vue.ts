@@ -80,6 +80,14 @@ export const VocPortal = defineComponent({
       },
     )
     watch(
+      () => props.minHeight,
+      (minHeight) => {
+        if (minHeight !== undefined) {
+          portal?.setMinHeight(minHeight)
+        }
+      },
+    )
+    watch(
       () => props.theme,
       (theme) => {
         if (theme !== undefined) {
